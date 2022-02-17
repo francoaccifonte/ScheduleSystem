@@ -12,8 +12,9 @@
 #
 # Indexes
 #
-#  index_course_students_on_course_id   (course_id)
-#  index_course_students_on_student_id  (student_id)
+#  index_course_students_on_course_id                 (course_id)
+#  index_course_students_on_student_id                (student_id)
+#  index_course_students_on_student_id_and_course_id  (student_id,course_id) UNIQUE
 #
 # Foreign Keys
 #
@@ -21,7 +22,9 @@
 #  fk_rails_...  (student_id => students.id) ON DELETE => cascade
 #
 class CourseStudent < ApplicationRecord
-  self.table_name = "courses_students"
   belongs_to :course
   belongs_to :student
+
+  validates :course, :student, presence: true
+  validates :course_id, uniqueness: { scope: :student_id }
 end

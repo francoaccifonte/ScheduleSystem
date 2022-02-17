@@ -11,5 +11,9 @@
 #  updated_at :datetime         not null
 #
 class Student < ApplicationRecord
-  has_and_belongs_to_many :courses
+  has_many :course_students
+  has_many :courses, through: :course_students
+
+  validates :first_name, presence: true
+  validates :last_name, presence: true
 end

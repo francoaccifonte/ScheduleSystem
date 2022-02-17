@@ -12,8 +12,9 @@
 #
 # Indexes
 #
-#  index_course_students_on_course_id   (course_id)
-#  index_course_students_on_student_id  (student_id)
+#  index_course_students_on_course_id                 (course_id)
+#  index_course_students_on_student_id                (student_id)
+#  index_course_students_on_student_id_and_course_id  (student_id,course_id) UNIQUE
 #
 # Foreign Keys
 #

@@ -14,5 +14,13 @@
 require 'rails_helper'
 
 RSpec.describe Course, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  context 'when subscribing twice to the same course' do
+    let(:student) { create(:student) }
+    let(:course) { create(:course) }
+
+    it 'should not create a new course_student' do
+      course.students << student
+      expect { course.students << student }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
 end
