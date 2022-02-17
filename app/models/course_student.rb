@@ -21,6 +21,7 @@
 #  fk_rails_...  (student_id => students.id) ON DELETE => cascade
 #
 class CourseStudent < ApplicationRecord
+  self.table_name = "courses_students"
   belongs_to :course
   belongs_to :student
 end

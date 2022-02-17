@@ -22,7 +22,7 @@ RSpec.describe 'Courses', type: :request do
   end
 
   describe 'GET /index' do
-    subject { get course_path }
+    subject { get courses_path }
 
     before { subject }
 
@@ -31,10 +31,27 @@ RSpec.describe 'Courses', type: :request do
     end
 
     it 'returns the correct list of courses' do
-      expected_response = Course.all.map do |course|
-        course.attributes.slice(:code, :description, :title)
+      expected_response = Course.all.order(id: :asc).map do |course|
+        course.attributes.slice('id', 'code', 'description', 'title').symbolize_keys
       end
-      expect(response_body > { courses: expected_response }).to be_truthy
+      response_body.fetch(:courses).each_with_index do |course, index|
+        expect(course > expected_response[index]).to be true
+      end
+    end
+  end
+
+  describe 'GET /show' do
+    subject { get course_path(course) }
+
+    before { subject }
+
+    it 'has a 200 status code' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns the correct course' do
+      expected_response = course.attributes.slice('id', 'code', 'description', 'title').symbolize_keys
+      expect(response_body.fetch(:course) > expected_response).to be true
     end
   end
 
@@ -53,7 +70,7 @@ RSpec.describe 'Courses', type: :request do
 
       created_course = Course.find(response_body.dig(:course, :id))
       expect(created_course).to be_present
-      expect(created_course.attributes > course_params).to be_truthy
+      expect(created_course.attributes.symbolize_keys > course_params).to be_truthy
     end
   end
 
@@ -74,7 +91,7 @@ RSpec.describe 'Courses', type: :request do
     it 'deletes the correct associations' do
       expect { subject }.to change { CourseStudent.count }.by(-course_students.count)
       expect { CourseStudent.find_by!(course:) }.to raise_error(ActiveRecord::RecordNotFound)
-      expect { CourseStudent.where(course: other_course).count }.to eq(unrelated_course_students.count)
+      expect(CourseStudent.where(course: other_course).count).to eq(unrelated_course_students.count)
     end
   end
 
@@ -89,7 +106,7 @@ RSpec.describe 'Courses', type: :request do
     end
 
     it 'updates the correct course' do
-      expect { subject }.to change { course.reload.attributes > course_params }.from(false).to(true)
+      expect { subject }.to change { course.reload.attributes.symbolize_keys > course_params }.from(false).to(true)
     end
   end
 end
