@@ -39,6 +39,30 @@ RSpec.describe 'Students', type: :request do
     end
   end
 
+  describe 'GET /show' do
+    subject { get student_path(student) }
+
+    before { subject }
+
+    it 'has a 200 status code' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns the correct student' do
+      expected_response = student.attributes.slice('id', 'first_name', 'last_name').symbolize_keys
+      expect(response_body.fetch(:student) > expected_response).to be true
+    end
+
+    it 'returns the correct list of courses' do
+      expected_courses = student.courses.order(id: :asc).map do |course|
+        course.attributes.slice(:code, :title, :description).symbolize_keys
+      end
+      response_body.dig(:student, :courses).each_with_index do |course, index|
+        expect(course > expected_courses[index]).to be true
+      end
+    end
+  end
+
   describe 'POST /create' do
     let(:student_params) { attributes_for(:student) }
 
