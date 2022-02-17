@@ -13,8 +13,8 @@
 #
 FactoryBot.define do
   factory :course do
-    code { Faker::Lorem.word }
-    description { Faker::Lorem.paragraph }
-    title { Faker::Lorem.sentence }
+    code { Faker::Lorem.unique.word }
+    description { Faker::Lorem.unique.paragraph }
+    title { Faker::Lorem.unique.sentence }
   end
 end
