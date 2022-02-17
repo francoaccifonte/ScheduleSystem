@@ -53,6 +53,15 @@ RSpec.describe 'Courses', type: :request do
       expected_response = course.attributes.slice('id', 'code', 'description', 'title').symbolize_keys
       expect(response_body.fetch(:course) > expected_response).to be true
     end
+
+    it 'returns the correct list of students' do
+      expected_students = course.students.order(id: :asc).map do |course|
+        course.attributes.slice(:name, :last_name).symbolize_keys
+      end
+      response_body.dig(:course, :students).each_with_index do |course, index|
+        expect(course > expected_students[index]).to be true
+      end
+    end
   end
 
   describe 'POST /create' do

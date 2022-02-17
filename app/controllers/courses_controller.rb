@@ -8,7 +8,7 @@ class CoursesController < ApplicationController
   end
 
   def show
-    render json: { course: @course.attributes }
+    render json: { course: @course.attributes.merge!(students: @course.students.map(&:attributes)) }
   end
 
   def create
