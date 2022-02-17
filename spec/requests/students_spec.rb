@@ -30,10 +30,12 @@ RSpec.describe 'Students', type: :request do
     end
 
     it 'returns the correct list of students' do
-      expected_response = Student.all.map do |student|
-        student.attributes.slice(:id, :first_name, :last_name)
+      expected_response = Student.all.order(id: :asc).map do |course|
+        course.attributes.slice('id', 'first_name', 'last_name').symbolize_keys
       end
-      expect(response_body > { students: expected_response }).to be_truthy
+      response_body.fetch(:students).each_with_index do |student, index|
+        expect(student > expected_response[index]).to be true
+      end
     end
   end
 
@@ -52,7 +54,7 @@ RSpec.describe 'Students', type: :request do
 
       created_student = Student.find(response_body.dig(:student, :id))
       expect(created_student).to be_present
-      expect(created_student.attributes > student_params).to be_truthy
+      expect(created_student.attributes.symbolize_keys > student_params).to be_truthy
     end
   end
 
@@ -73,7 +75,7 @@ RSpec.describe 'Students', type: :request do
     it 'deletes the correct associations' do
       expect { subject }.to change { CourseStudent.count }.by(-course_students.count)
       expect { CourseStudent.find_by!(student:) }.to raise_error(ActiveRecord::RecordNotFound)
-      expect { CourseStudent.where(student: other_student).count }.to eq(unrelated_course_students.count)
+      expect(CourseStudent.where(student: other_student).count).to eq(unrelated_course_students.count)
     end
   end
 
@@ -88,7 +90,7 @@ RSpec.describe 'Students', type: :request do
     end
 
     it 'updates the correct student' do
-      expect { subject }.to change { student.reload.attributes > student_params }.from(false).to(true)
+      expect { subject }.to change { student.reload.attributes.symbolize_keys > student_params }.from(false).to(true)
     end
 
     context 'when subscribing to a new course' do
@@ -104,7 +106,7 @@ RSpec.describe 'Students', type: :request do
       end
 
       it 'updates the correct student' do
-        expect { subject }.to change { student.reload.attributes > params }.from(false).to(true)
+        expect { subject }.to change { student.reload.attributes.symbolize_keys > student_params }.from(false).to(true)
       end
     end
   end
